@@ -125,4 +125,42 @@ def top_proveedores(x_api_key: str = Header(None)):
     return {
         "columnas_detectadas": columnas,
         "datos": df.head(20).to_dict(orient="records")
+    } @app.get("/analizar-material")
+def analizar_material(
+    nombre: str,
+    x_api_key: str = Header(None)
+):
+    verificar_api_key(x_api_key)
+
+    df = pd.read_excel(EXCEL, sheet_name="api_materiales").fillna("")
+
+    resultado = df[
+        df["material"].astype(str)
+        .str.contains(nombre, case=False, na=False)
+    ]
+
+    if len(resultado) == 0:
+        return {
+            "material_buscado": nombre,
+            "encontrado": False,
+            "mensaje": "No se encontraron materiales coincidentes"
+        }
+
+    return {
+        "material_buscado": nombre,
+        "encontrado": True,
+        "numero_resultados": len(resultado),
+        "resultados": resultado[[
+            "material",
+            "medida",
+            "lineas_compra",
+            "cantidad_total",
+            "precio_medio",
+            "precio_min",
+            "precio_max",
+            "ultimo_precio",
+            "ultima_fecha_iso",
+            "ultimo_proveedor",
+            "proveedor_habitual"
+        ]].to_dict(orient="records")
     }
