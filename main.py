@@ -122,14 +122,13 @@ def top_proveedores(x_api_key: str = Header(None)):
 
     columnas = list(df.columns)
 
-    return {
+        return {
         "columnas_detectadas": columnas,
         "datos": df.head(20).to_dict(orient="records")
-    } @app.get("/analizar-material")
-def analizar_material(
-    nombre: str,
-    x_api_key: str = Header(None)
-):
+    }
+
+
+@app.get("/analizar-material")
     verificar_api_key(x_api_key)
 
     df = pd.read_excel(EXCEL, sheet_name="api_materiales").fillna("")
